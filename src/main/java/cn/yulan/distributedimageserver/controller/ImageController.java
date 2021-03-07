@@ -1,15 +1,13 @@
-package com.yulan.distributedimageserver.controller;
+package cn.yulan.distributedimageserver.controller;
 
-import com.yulan.distributedimageserver.result.BaseResult;
+import cn.yulan.distributedimageserver.result.BaseResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
 
-import static com.yulan.distributedimageserver.util.ConstUtil.*;
+import static cn.yulan.distributedimageserver.util.ConstUtil.*;
 
 /**
  * 图片相关操作控制层

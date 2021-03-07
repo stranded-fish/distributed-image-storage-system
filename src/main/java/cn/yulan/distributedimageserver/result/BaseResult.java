@@ -1,4 +1,4 @@
-package com.yulan.distributedimageserver.result;
+package cn.yulan.distributedimageserver.result;
 
 
 /**

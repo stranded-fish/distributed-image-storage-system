@@ -1,4 +1,4 @@
-package com.yulan.distributedimageserver.util;
+package cn.yulan.distributedimageserver.util;
 
 /**
  * 常量字典

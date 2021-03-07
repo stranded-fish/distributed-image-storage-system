@@ -1,4 +1,4 @@
-package com.yulan.distributedimageserver;
+package cn.yulan.distributedimageserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

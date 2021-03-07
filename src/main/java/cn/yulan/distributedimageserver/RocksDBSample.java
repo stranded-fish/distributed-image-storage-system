@@ -1,4 +1,4 @@
-package com.yulan.distributedimageserver;
+package cn.yulan.distributedimageserver;
 
 // Copyright (c) 2011-present, Facebook, Inc.  All rights reserved.
 //  This source code is licensed under both the GPLv2 (found in the
