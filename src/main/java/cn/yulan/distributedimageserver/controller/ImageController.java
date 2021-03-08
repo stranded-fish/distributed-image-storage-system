@@ -38,9 +38,7 @@ public class ImageController {
             dest.getParentFile().mkdirs();
         }
         try {
-            System.out.println("bbb");
             uploadImg.transferTo(dest); // 保存文件
-            System.out.println("aaa");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,6 +46,7 @@ public class ImageController {
 //        editHomePageService.saveTotalLayoutInfo(totalLayoutInfoBean, result);
         return result;
     }
+
 
     @RequestMapping(value = DELETE_IMAGE, method = RequestMethod.GET)
     @ResponseBody
