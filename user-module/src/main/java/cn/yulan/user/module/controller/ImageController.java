@@ -6,6 +6,7 @@ import com.baidu.brpc.client.BrpcProxy;
 import com.baidu.brpc.client.RpcClient;
 import com.googlecode.protobuf.format.JsonFormat;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -15,8 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 import cn.yulan.storage.module.server.service.ExampleProto;
 import cn.yulan.storage.module.server.service.ExampleService;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import static cn.yulan.user.module.util.ConstUtil.*;
 
@@ -49,8 +53,23 @@ public class ImageController {
 
         String path = "E:/images/";
 
-        //获取项目classes/static的地址
-        String fileName = uploadImg.getOriginalFilename();  //获取文件名
+        // eg 1 直接用文件名
+        // String fileName = uploadImg.getOriginalFilename();  //获取文件名
+
+        // eg 2 用 md5 算法计算得出文件名
+        String myHash = null;
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(uploadImg.getBytes());
+            byte[] digest = messageDigest.digest();
+            myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
+            System.out.println("myHash:" + myHash);
+        } catch (NoSuchAlgorithmException | IOException e) {
+            e.printStackTrace();
+        }
+
+
+        String fileName = myHash + "." + FilenameUtils.getExtension(uploadImg.getOriginalFilename());
 
         String savePath = path + fileName;  //图片保存路径
 
