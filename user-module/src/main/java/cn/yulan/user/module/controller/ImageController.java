@@ -2,6 +2,8 @@ package cn.yulan.user.module.controller;
 
 import cn.yulan.user.module.result.BaseResult;
 import cn.yulan.user.module.service.ImageService;
+import cn.yulan.user.module.util.ConstUtil;
+import cn.yulan.user.module.util.ValidationUtil;
 import com.baidu.brpc.client.BrpcProxy;
 import com.baidu.brpc.client.RpcClient;
 import com.googlecode.protobuf.format.JsonFormat;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import cn.yulan.storage.module.server.service.ExampleProto;
 import cn.yulan.storage.module.server.service.ExampleService;
 
+import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
@@ -51,65 +54,10 @@ public class ImageController {
     public BaseResult<String> uploadImage(@RequestParam("uploadImg") MultipartFile uploadImg) {
         BaseResult<String> result = new BaseResult<>();
 
-        String path = "E:/images/";
-
-        // eg 1 直接用文件名
-        // String fileName = uploadImg.getOriginalFilename();  //获取文件名
-
-        // eg 2 用 md5 算法计算得出文件名
-        String myHash = null;
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.update(uploadImg.getBytes());
-            byte[] digest = messageDigest.digest();
-            myHash = DatatypeConverter.printHexBinary(digest).toUpperCase();
-            System.out.println("myHash:" + myHash);
-        } catch (NoSuchAlgorithmException | IOException e) {
-            e.printStackTrace();
+        // 验证上传文件是否合法
+        if (ValidationUtil.validate(uploadImg, result)) {
+//            imageService.set(uploadImg, result);
         }
-
-
-        String fileName = myHash + "." + FilenameUtils.getExtension(uploadImg.getOriginalFilename());
-
-        String savePath = path + fileName;  //图片保存路径
-
-        File saveFile = new File(savePath);
-        if (!saveFile.exists()) {
-            saveFile.mkdirs();
-        }
-        try {
-            uploadImg.transferTo(saveFile);  //将临时存储的文件移动到真实存储路径下
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //返回图片访问地址
-
-
-//        String ipPorts = "list://127.0.0.1:8051,127.0.0.1:8052,127.0.0.1:8053";
-//        String key = fileName;
-//        String value = path + "/" + fileName;
-//
-//        // init rpc client
-//        RpcClient rpcClient = new RpcClient(ipPorts);
-//        ExampleService exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);
-//        final JsonFormat jsonFormat = new JsonFormat();
-//
-//        // set
-//        if (value != null) {
-//            ExampleProto.SetRequest setRequest = ExampleProto.SetRequest.newBuilder()
-//                    .setKey(key).setValue(value).build();
-//            ExampleProto.SetResponse setResponse = exampleService.set(setRequest);
-//            System.out.printf("set request, key=%s value=%s response=%s\n",
-//                    key, value, jsonFormat.printToString(setResponse));
-//        } else {
-//            // get
-//            ExampleProto.GetRequest getRequest = ExampleProto.GetRequest.newBuilder()
-//                    .setKey(key).build();
-//            ExampleProto.GetResponse getResponse = exampleService.get(getRequest);
-//            System.out.printf("get request, key=%s, response=%s\n",
-//                    key, jsonFormat.printToString(getResponse));
-//        }
 
         return result;
     }
@@ -136,6 +84,8 @@ public class ImageController {
         }
         return result;
     }
+
+
 
 
 }
