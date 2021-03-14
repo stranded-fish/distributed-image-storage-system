@@ -56,7 +56,7 @@ public class ImageController {
 
         // 验证上传文件是否合法
         if (ValidationUtil.validate(uploadImg, result)) {
-//            imageService.set(uploadImg, result);
+            imageService.set(uploadImg, result);
         }
 
         return result;

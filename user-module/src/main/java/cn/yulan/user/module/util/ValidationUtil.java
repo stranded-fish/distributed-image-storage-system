@@ -2,11 +2,12 @@ package cn.yulan.user.module.util;
 
 import cn.yulan.user.module.result.BaseResult;
 import org.apache.tika.Tika;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 
@@ -16,9 +17,14 @@ import java.io.IOException;
  * @author Yulan Zhou
  * @date 2021/03/13
  */
+@Component
 public class ValidationUtil {
 
-    private static PropertiesExtractionUtil propertiesExtractionUtil = new PropertiesExtractionUtil();
+    @Value("${multipartFile.maxFileSize}")
+    private String maxFileSize;
+
+    private static long MAXFILESIZEINBYTE;
+
 
     public static boolean validate(MultipartFile uploadImg, BaseResult<String> result) {
 
@@ -35,7 +41,7 @@ public class ValidationUtil {
         }
 
         // 判断图片规格是否符合要求
-        if (!whetherMeetsRequirement(uploadImg)) {
+        if (!whetherMeetsRequirements(uploadImg)) {
             result.construct(ConstUtil.NOT_MEET_REQUIREMENTS, false, null);
             return false;
         }
@@ -50,23 +56,45 @@ public class ValidationUtil {
         try {
             // 检测文件的 MIME 类型
             String mimeType = tika.detect(uploadImg.getInputStream());
-            if (mimeType.startsWith("image")) return true;
+            if (!mimeType.startsWith("image")) return false;
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return false;
+        return true;
     }
 
-    private static boolean whetherMeetsRequirement(MultipartFile uploadImg) {
-        System.out.println(propertiesExtractionUtil.getProperty("maxFileSize"));
+    private static boolean whetherMeetsRequirements(MultipartFile uploadImg) {
 
-        System.out.println(uploadImg.getSize());
-        System.out.println("bbbb");
+        // 检测图片大小是否符合要求
+        if (uploadImg.getSize() > MAXFILESIZEINBYTE) {
+           return false;
+        }
 
-        // TODO
-        return false;
+        return true;
     }
 
-
+    @PostConstruct
+    private void getMaxFileSizeInByte() {
+        try {
+        String unit = maxFileSize.substring(maxFileSize.length() - 2).toUpperCase();
+        long size = Integer.parseInt(maxFileSize.substring(0, maxFileSize.length() - 2).trim());
+            switch (unit) {
+                case "MB":
+                    MAXFILESIZEINBYTE = size * 1024 * 1024;
+                    break;
+                case "KB":
+                    MAXFILESIZEINBYTE = size * 1024;
+                    break;
+                case "B":
+                    MAXFILESIZEINBYTE = size;
+                    break;
+                default:
+                    throw new Exception();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 }
