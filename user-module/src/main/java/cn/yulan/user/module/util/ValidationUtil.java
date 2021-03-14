@@ -26,7 +26,7 @@ public class ValidationUtil {
     private static long MAXFILESIZEINBYTE;
 
 
-    public static boolean validate(MultipartFile uploadImg, BaseResult<String> result) {
+    public static boolean validate(MultipartFile uploadImg, BaseResult<?> result) {
 
         // 判断上传文件是否为空
         if (uploadImg.isEmpty()) {

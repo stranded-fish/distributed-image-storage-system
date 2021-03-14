@@ -2,28 +2,21 @@ package cn.yulan.user.module.controller;
 
 import cn.yulan.user.module.result.BaseResult;
 import cn.yulan.user.module.service.ImageService;
-import cn.yulan.user.module.util.ConstUtil;
 import cn.yulan.user.module.util.ValidationUtil;
-import com.baidu.brpc.client.BrpcProxy;
-import com.baidu.brpc.client.RpcClient;
-import com.googlecode.protobuf.format.JsonFormat;
+import com.google.protobuf.ByteString;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import cn.yulan.storage.module.server.service.ExampleProto;
-import cn.yulan.storage.module.server.service.ExampleService;
 
-import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import static cn.yulan.user.module.util.ConstUtil.*;
 
@@ -83,6 +76,45 @@ public class ImageController {
             System.out.println("Failed to delete empty directory: " + dir);
         }
         return result;
+    }
+
+
+    @RequestMapping(value = "/test/{key}")
+    @ResponseBody
+    public ResponseEntity<?> test(@PathVariable String key) {
+//        ProxyMessage.GetRequest request = ProxyMessage.GetRequest.newBuilder()
+//                .setKey(ByteString.copyFrom(key.getBytes())).build();
+//        ProxyMessage.GetResponse response = proxyAPI.get(request);
+//        if (response == null
+//                || response.getBaseRes().getResCode()
+//                != CommonMessage.ResCode.RES_CODE_SUCCESS) {
+//            LOG.warn("request proxy failed, fileName={}", key);
+//            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+//        }
+//        LOG.info("/download success, key={}", key);
+//        String fileExt = ExampleUtils.getFileExtension(key);
+//        String contentType = ExampleUtils.convertExtToContentType(fileExt);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.valueOf(contentType));
+
+
+//        String fileExt = FilenameUtils.getExtension(uploadImg.getOriginalFilename());
+//        String contentType = ExampleUtils.convertExtToContentType(fileExt);
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.valueOf(contentType));
+        System.out.println("aaa");
+        System.out.println(key);
+        System.out.println("bbb");
+        File file = new File("E:\\images\\2021\\03\\14\\4A0E4021F2AC7A03.jpg");
+
+        String fileExt = FilenameUtils.getExtension(key);
+        String contentType = "image/" + fileExt;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", contentType);
+        ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(new byte[1], headers, HttpStatus.CREATED);
+        return responseEntity;
+
+
     }
 
 

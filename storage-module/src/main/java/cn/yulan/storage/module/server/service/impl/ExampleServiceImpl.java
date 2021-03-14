@@ -60,6 +60,7 @@ public class ExampleServiceImpl implements ExampleService {
     @Override
     public ExampleProto.SetResponse set(ExampleProto.SetRequest request) {
         ExampleProto.SetResponse.Builder responseBuilder = ExampleProto.SetResponse.newBuilder();
+
         // 如果自己不是leader，将写请求转发给leader
         if (raftNode.getLeaderId() <= 0) {
             responseBuilder.setSuccess(false);
