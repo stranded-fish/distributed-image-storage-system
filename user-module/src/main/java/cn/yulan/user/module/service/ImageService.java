@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ImageService {
 
-    void set(MultipartFile uploadImg, BaseResult<String> result);
+    void upload(MultipartFile uploadImg, BaseResult<String> result);
 
 
 }

@@ -1,9 +1,16 @@
 package cn.yulan.user.module.util;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.tools.ant.taskdefs.Sleep;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -12,65 +19,59 @@ import java.util.UUID;
  * @author Yulan Zhou
  * @date 2021/03/12
  */
+@Component
 public class FileUtil {
+
+    @Value("${multipartFile.base-dir}")
+    private String preSetBaseDir;
+
+    private static String baseDir;
+
+
     /**
-     * 获取文件后缀
+     * 利用 MD5 算法获得上传图片唯一标识
      *
-     * @param fileName
-     * @return
+     * @param multipartFile 上传图片
+     * @return java.lang.String
+     * @author Yulan Zhou
+     * @date 2021/3/15
      */
-    public static String getSuffix(String fileName) {
-        return fileName.substring(fileName.lastIndexOf("."));
-    }
-
-    /**
-     * 生成新的文件名
-     *
-     * @param fileOriginName 源文件名
-     * @return
-     */
-    public static String getFileName(String fileOriginName) {
-        return getUUID() + getSuffix(fileOriginName);
-    }
-
-    public static String getUUID() {
-        return UUID.randomUUID().toString().replace("-", "");
-    }
-
-    /**
-     * @param file     文件
-     * @param path     文件存放路径
-     * @param fileName 源文件名
-     * @return
-     */
-    public static String upload(MultipartFile file, String path, String fileName) {
-        String newFileName = getFileName(fileName);
-        // 生成新的文件名
-        String realPath = path + newFileName;
-
-        //使用原文件名
-//        String realPath = path + "/" + fileName;
-
-        File dest = new File(realPath);
-
-        //判断文件父目录是否存在
-        if (!dest.getParentFile().exists()) {
-            dest.getParentFile().mkdir();
-        }
-
+    public static String getMD5(MultipartFile multipartFile) {
+        String md5 = null;
         try {
-            //保存文件
-            file.transferTo(dest);
-            return newFileName;
-        } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
+            md5 = DigestUtils.md5Hex(multipartFile.getBytes());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            return null;
         }
+        return md5;
+    }
 
+
+    public static String getDateDir() {
+        // 生成 value - 保存路径
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        return simpleDateFormat.format(date) + File.separator;
+    }
+
+    public static String getBaseDir() {
+        return baseDir;
+    }
+
+    public static void save(MultipartFile uploadImg, String savePath) {
+        File file = new File(savePath);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+        try {
+            uploadImg.transferTo(file);  //将临时存储的文件移动到真实存储路径下
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @PostConstruct
+    private void setBaseDir() {
+        baseDir = preSetBaseDir;
     }
 }

@@ -3,20 +3,17 @@ package cn.yulan.user.module.controller;
 import cn.yulan.user.module.result.BaseResult;
 import cn.yulan.user.module.service.ImageService;
 import cn.yulan.user.module.util.ValidationUtil;
-import com.google.protobuf.ByteString;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 
 import static cn.yulan.user.module.util.ConstUtil.*;
 
@@ -49,7 +46,7 @@ public class ImageController {
 
         // 验证上传文件是否合法
         if (ValidationUtil.validate(uploadImg, result)) {
-            imageService.set(uploadImg, result);
+            imageService.upload(uploadImg, result);
         }
 
         return result;

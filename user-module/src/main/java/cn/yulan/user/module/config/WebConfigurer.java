@@ -1,9 +1,7 @@
 package cn.yulan.user.module.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,7 +18,8 @@ public class WebConfigurer implements WebMvcConfigurer {
      * 图片保存路径，自动从yml文件中获取数据
      * 示例： E:/images/
      */
-    private String fileSavePath = "E:/images/";
+    @Value("${multipartFile.base-dir}")
+    private String baseDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -31,7 +30,7 @@ public class WebConfigurer implements WebMvcConfigurer {
          * 注意：E:/images/ 后面的 “/”一定要带上
          */
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:" + fileSavePath);
+                .addResourceLocations("file:" + baseDir);
     }
 
 }
