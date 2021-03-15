@@ -64,7 +64,7 @@ public class FileUtil {
             file.getParentFile().mkdirs();
         }
         try {
-            uploadImg.transferTo(file);  //将临时存储的文件移动到真实存储路径下
+            uploadImg.transferTo(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
