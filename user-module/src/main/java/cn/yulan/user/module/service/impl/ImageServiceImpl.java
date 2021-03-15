@@ -1,12 +1,18 @@
 package cn.yulan.user.module.service.impl;
 
+import cn.yulan.storage.module.server.service.ExampleProto;
+import cn.yulan.storage.module.server.service.ExampleService;
 import cn.yulan.user.module.dao.ImageKVDAO;
 import cn.yulan.user.module.result.BaseResult;
 import cn.yulan.user.module.service.ImageService;
 import cn.yulan.user.module.util.FileUtil;
+import com.baidu.brpc.client.BrpcProxy;
+import com.baidu.brpc.client.RpcClient;
+import com.googlecode.protobuf.format.JsonFormat;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +29,9 @@ import java.io.File;
 public class ImageServiceImpl implements ImageService {
 
     private final ImageKVDAO imageKVDAO;
+
+    @Value("${raft.ipPorts}")
+    private String ipPorts;
 
     @Override
     public void upload(MultipartFile uploadImg, BaseResult<String> result) {
@@ -49,7 +58,7 @@ public class ImageServiceImpl implements ImageService {
         }
 
         // 返回图片地址
-        result.construct(null,false, null);
+        result.construct(null, false, null);
     }
 
     private void save(String key, MultipartFile uploadImg) {
@@ -60,40 +69,24 @@ public class ImageServiceImpl implements ImageService {
         String savePath = FileUtil.getBaseDir() + relativePath;
         System.out.println("savePath: " + savePath);
 
-
         FileUtil.save(uploadImg, savePath);
 
         // 保存 图片 key - value 到 本地数据库
         imageKVDAO.put(key.getBytes(), relativePath.getBytes());
 
-
         // 保存 图片 key - value 到 Raft 集群
-        // TODO
 
-//            String ipPorts = "list://127.0.0.1:8051,127.0.0.1:8052,127.0.0.1:8053";
-//            String key = fileName;
-//            String value = path + "/" + fileName;
+        // 初始化 rpc client
+        RpcClient rpcClient = new RpcClient(ipPorts);
+        ExampleService exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);
+        final JsonFormat jsonFormat = new JsonFormat();
 
-//        // init rpc client
-//        RpcClient rpcClient = new RpcClient(ipPorts);
-//        ExampleService exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);
-//        final JsonFormat jsonFormat = new JsonFormat();
-//
-//        // set
-//        if (value != null) {
-//            ExampleProto.SetRequest setRequest = ExampleProto.SetRequest.newBuilder()
-//                    .setKey(key).setValue(value).build();
-//            ExampleProto.SetResponse setResponse = exampleService.set(setRequest);
-//            System.out.printf("set request, key=%s value=%s response=%s\n",
-//                    key, value, jsonFormat.printToString(setResponse));
-//        } else {
-//            // get
-//            ExampleProto.GetRequest getRequest = ExampleProto.GetRequest.newBuilder()
-//                    .setKey(key).build();
-//            ExampleProto.GetResponse getResponse = exampleService.get(getRequest);
-//            System.out.printf("get request, key=%s, response=%s\n",
-//                    key, jsonFormat.printToString(getResponse));
-//        }
+        // set
+        ExampleProto.SetRequest setRequest = ExampleProto.SetRequest.newBuilder()
+                .setKey(key).setValue(relativePath).build();
+        ExampleProto.SetResponse setResponse = exampleService.set(setRequest);
+        System.out.printf("set request, key=%s value=%s response=%s\n",
+                key, relativePath, jsonFormat.printToString(setResponse));
     }
 
 }
