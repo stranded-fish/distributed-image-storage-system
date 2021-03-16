@@ -1,5 +1,6 @@
 package cn.yulan.storage.module.server.service.impl;
 
+import cn.yulan.storage.module.util.ImageUtil;
 import com.baidu.brpc.client.BrpcProxy;
 import com.baidu.brpc.client.RpcClient;
 import com.baidu.brpc.client.RpcClientOptions;
@@ -70,6 +71,9 @@ public class ExampleServiceImpl implements ExampleService {
             ExampleProto.SetResponse responseFromLeader = exampleService.set(request);
             responseBuilder.mergeFrom(responseFromLeader);
         } else {
+            // 获取 uploadServer 图片资源
+            ImageUtil.saveImage(request.getValue(), "GET");
+
             // 数据同步写入raft集群
             byte[] data = request.toByteArray();
             boolean success = raftNode.replicate(data, RaftProto.EntryType.ENTRY_TYPE_DATA);
