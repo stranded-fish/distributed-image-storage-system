@@ -10,8 +10,9 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
+        <module>access-module</module>
         <module>storage-module</module>
-        <module>user-module</module>
+        <module>upload-module</module>
     </modules>
 
     <properties>
