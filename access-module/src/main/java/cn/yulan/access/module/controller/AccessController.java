@@ -1,6 +1,7 @@
 package cn.yulan.access.module.controller;
 
 import cn.yulan.access.module.result.BaseResult;
+import cn.yulan.access.module.service.CloneService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletResponse;
 
 import static cn.yulan.access.module.util.ConstUtil.*;
 
@@ -20,12 +23,12 @@ import static cn.yulan.access.module.util.ConstUtil.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AccessController {
 
-    @RequestMapping(value = CLONE_IMAGE, method = RequestMethod.GET)
-    @ResponseBody
-    public BaseResult<?> cloneImage() {
-        BaseResult<Boolean> result = new BaseResult<>();
+    private final CloneService cloneService;
 
-        return result;
+    @RequestMapping(value = CLONE_IMAGES, method = RequestMethod.GET)
+    @ResponseBody
+    public void cloneImages(HttpServletResponse httpServletResponse) {
+        cloneService.cloneImages(httpServletResponse);
     }
 
 

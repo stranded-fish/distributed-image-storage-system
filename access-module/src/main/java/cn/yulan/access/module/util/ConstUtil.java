@@ -6,6 +6,6 @@ package cn.yulan.access.module.util;
  * @author Yulan Zhou
  */
 public class ConstUtil {
-    public static final String CLONE_IMAGE = "/clone";
+    public static final String CLONE_IMAGES = "/clone";
 
 }
