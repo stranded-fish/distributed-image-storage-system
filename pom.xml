@@ -13,6 +13,7 @@
         <module>access-module</module>
         <module>storage-module</module>
         <module>upload-module</module>
+        <module>raft-java-core</module>
     </modules>
 
     <properties>
