@@ -51,13 +51,13 @@ public class ServerMain {
         // 初始化RaftNode
         RaftNode raftNode = new RaftNode(raftOptions, serverList, localServer, stateMachine);
         // 注册Raft节点之间相互调用的服务
-        RaftConsensusService raftConsensusService = new RaftConsensusServiceImpl(raftNode);
+        RaftConsensusService raftConsensusService = new RaftConsensusServiceImpl(raftNode); // TODO
         server.registerService(raftConsensusService);
         // 注册给Client调用的Raft服务
-        RaftClientService raftClientService = new RaftClientServiceImpl(raftNode);
+        RaftClientService raftClientService = new RaftClientServiceImpl(raftNode); // TODO
         server.registerService(raftClientService);
         // 注册应用自己提供的服务
-        ExampleService exampleService = new ExampleServiceImpl(raftNode, stateMachine);
+        ExampleService exampleService = new ExampleServiceImpl(raftNode, stateMachine, raftOptions);// TODO
         server.registerService(exampleService);
         // 启动RPCServer，初始化Raft节点
         server.start();

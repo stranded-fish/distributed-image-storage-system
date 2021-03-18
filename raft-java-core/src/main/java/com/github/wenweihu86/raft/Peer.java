@@ -73,4 +73,10 @@ public class Peer {
     public void setCatchUp(boolean catchUp) {
         isCatchUp = catchUp;
     }
+
+    public RpcClient createClient() {
+        return new RpcClient(new Endpoint(    // rpc 客户端
+                server.getEndpoint().getHost(),
+                server.getEndpoint().getPort()));   // 通过 RpcClient 构建 RaftConsensusServiceAsync 的代理类
+    }
 }

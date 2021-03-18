@@ -10,6 +10,7 @@ import cn.yulan.storage.module.server.ExampleStateMachine;
 import cn.yulan.storage.module.server.service.ExampleProto;
 import cn.yulan.storage.module.server.service.ExampleService;
 import com.github.wenweihu86.raft.RaftNode;
+import com.github.wenweihu86.raft.RaftOptions;
 import com.github.wenweihu86.raft.proto.RaftProto;
 import com.googlecode.protobuf.format.JsonFormat;
 import org.slf4j.Logger;
@@ -32,10 +33,13 @@ public class ExampleServiceImpl implements ExampleService {
     private int leaderId = -1;
     private RpcClient leaderRpcClient = null;
     private Lock leaderLock = new ReentrantLock();
+    private Semaphore semaphore;
+    private ExampleService exampleService;
 
-    public ExampleServiceImpl(RaftNode raftNode, ExampleStateMachine stateMachine) {
+    public ExampleServiceImpl(RaftNode raftNode, ExampleStateMachine stateMachine, RaftOptions raftOptions) {
         this.raftNode = raftNode;
         this.stateMachine = stateMachine;
+        this.semaphore = new Semaphore(raftOptions.getConcurrentWindow());
     }
 
     private void onLeaderChangeEvent() {
@@ -63,25 +67,45 @@ public class ExampleServiceImpl implements ExampleService {
     public ExampleProto.SetResponse set(ExampleProto.SetRequest request) {
         ExampleProto.SetResponse.Builder responseBuilder = ExampleProto.SetResponse.newBuilder();
 
-        // 如果自己不是leader，将写请求转发给leader
-        if (raftNode.getLeaderId() <= 0) {
+        try {
+            semaphore.acquire();
+
+            // 如果自己不是leader，将写请求转发给leader
+            if (raftNode.getLeaderId() <= 0) {
+                responseBuilder.setSuccess(false);
+            } else if (raftNode.getLeaderId() != raftNode.getLocalServer().getServerId()) {
+//                onLeaderChangeEvent();
+//                ExampleService exampleService = BrpcProxy.getProxy(leaderRpcClient, ExampleService.class);
+//                ExampleProto.SetResponse responseFromLeader = exampleService.set(request);
+//                responseBuilder.mergeFrom(responseFromLeader);
+
+                LOG.info("receive set request, I'm not leader, dispatcher this request");
+                if (this.exampleService == null) {
+                    RpcClient rpcClient = raftNode.getPeerMap().get(raftNode.getLeaderId()).createClient();
+                    exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);    // 得到对应的代理类
+                }
+                ExampleProto.SetResponse responseFromLeader = exampleService.set(request);  // 向 Leader 节点发起请求，得到请求结果
+                responseBuilder.mergeFrom(responseFromLeader);  // 将两个结果合并
+            } else {
+                // 数据同步写入raft集群
+                byte[] data = request.toByteArray();
+                boolean success = raftNode.replicate(data, RaftProto.EntryType.ENTRY_TYPE_DATA);
+                responseBuilder.setSuccess(success);
+            }
+
+            ExampleProto.SetResponse response = responseBuilder.build();
+            LOG.info("set request, request={}, response={}", jsonFormat.printToString(request),
+                    jsonFormat.printToString(response));
+            return response;
+
+
+        } catch (InterruptedException e) {
             responseBuilder.setSuccess(false);
-        } else if (raftNode.getLeaderId() != raftNode.getLocalServer().getServerId()) {
-            onLeaderChangeEvent();
-            ExampleService exampleService = BrpcProxy.getProxy(leaderRpcClient, ExampleService.class);
-            ExampleProto.SetResponse responseFromLeader = exampleService.set(request);
-            responseBuilder.mergeFrom(responseFromLeader);
-        } else {
-            // 数据同步写入raft集群
-            byte[] data = request.toByteArray();
-            boolean success = raftNode.replicate(data, RaftProto.EntryType.ENTRY_TYPE_DATA);
-            responseBuilder.setSuccess(success);
+            return responseBuilder.build();
+        } finally {
+            semaphore.release();
         }
 
-        ExampleProto.SetResponse response = responseBuilder.build();
-        LOG.info("set request, request={}, response={}", jsonFormat.printToString(request),
-                jsonFormat.printToString(response));
-        return response;
     }
 
     @Override
