@@ -1,11 +1,8 @@
 package cn.yulan.storage.module.server;
 
-import com.github.wenweihu86.raft.StateMachine;
 import cn.yulan.storage.module.server.service.ExampleProto;
-import com.github.wenweihu86.raft.proto.RaftProto;
-import com.github.wenweihu86.raft.storage.SegmentedLog;
-import com.github.wenweihu86.raft.util.ImageUtil;
-import com.google.protobuf.ByteString;
+import cn.yulan.storage.module.util.ImageUtil;
+import com.github.wenweihu86.raft.StateMachine;
 import org.apache.commons.io.FileUtils;
 import org.rocksdb.Checkpoint;
 import org.rocksdb.Options;
