@@ -3,8 +3,11 @@ package com.github.wenweihu86.raft.service.impl;
 import com.github.wenweihu86.raft.RaftNode;
 import com.github.wenweihu86.raft.proto.RaftProto;
 import com.github.wenweihu86.raft.service.RaftConsensusService;
+import com.github.wenweihu86.raft.storage.SegmentedLog;
 import com.github.wenweihu86.raft.util.ConfigurationUtils;
+import com.github.wenweihu86.raft.util.ImageUtil;
 import com.github.wenweihu86.raft.util.RaftFileUtils;
+import com.google.protobuf.ByteString;
 import com.googlecode.protobuf.format.JsonFormat;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.Validate;
@@ -14,6 +17,12 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -183,6 +192,8 @@ public class RaftConsensusServiceImpl implements RaftConsensusService {
                             "in term {} (my term is {}), entryCount={} resCode={}",
                     request.getServerId(), request.getTerm(), raftNode.getCurrentTerm(),
                     request.getEntriesCount(), responseBuilder.getResCode());
+
+
             return responseBuilder.build();
         } finally {
             raftNode.getLock().unlock();

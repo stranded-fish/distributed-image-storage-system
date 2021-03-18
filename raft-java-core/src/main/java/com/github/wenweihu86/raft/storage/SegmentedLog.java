@@ -94,8 +94,8 @@ public class SegmentedLog {
         long newLastLogIndex = this.getLastLogIndex();
         for (RaftProto.LogEntry entry : entries) {
             newLastLogIndex++;
-            int entrySize = entry.getSerializedSize();
             int segmentSize = startLogIndexSegmentMap.size();
+            int entrySize = entry.getSerializedSize();
             boolean isNeedNewSegmentFile = false;
             try {
                 if (segmentSize == 0) {

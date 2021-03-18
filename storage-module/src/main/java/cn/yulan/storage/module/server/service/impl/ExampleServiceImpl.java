@@ -15,6 +15,7 @@ import com.googlecode.protobuf.format.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -71,9 +72,6 @@ public class ExampleServiceImpl implements ExampleService {
             ExampleProto.SetResponse responseFromLeader = exampleService.set(request);
             responseBuilder.mergeFrom(responseFromLeader);
         } else {
-            // 获取 uploadServer 图片资源
-            ImageUtil.saveImage(request.getValue(), "GET");
-
             // 数据同步写入raft集群
             byte[] data = request.toByteArray();
             boolean success = raftNode.replicate(data, RaftProto.EntryType.ENTRY_TYPE_DATA);

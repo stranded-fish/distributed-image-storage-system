@@ -77,16 +77,17 @@ public class ImageServiceImpl implements ImageService {
         // 保存 图片 key - value 到 Raft 集群
 
         // 初始化 rpc client
-//        RpcClient rpcClient = new RpcClient(ipPorts);
-//        ExampleService exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);
-//        final JsonFormat jsonFormat = new JsonFormat();
-//
-//        // set
-//        ExampleProto.SetRequest setRequest = ExampleProto.SetRequest.newBuilder()
-//                .setKey(key).setValue(relativePath).build();
-//        ExampleProto.SetResponse setResponse = exampleService.set(setRequest);
-//        System.out.printf("set request, key=%s value=%s response=%s\n",
-//                key, relativePath, jsonFormat.printToString(setResponse));
-    }
+        RpcClient rpcClient = new RpcClient(ipPorts);
+        ExampleService exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);
+        final JsonFormat jsonFormat = new JsonFormat();
 
+        // set
+        ExampleProto.SetRequest setRequest = ExampleProto.SetRequest.newBuilder()
+                .setKey(key).setValue(relativePath).build();
+        ExampleProto.SetResponse setResponse = exampleService.set(setRequest);
+        System.out.printf("set request, key=%s value=%s response=%s\n",
+                key, relativePath, jsonFormat.printToString(setResponse));
+
+        rpcClient.stop();
+    }
 }

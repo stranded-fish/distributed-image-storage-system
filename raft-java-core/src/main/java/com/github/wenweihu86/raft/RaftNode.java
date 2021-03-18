@@ -157,12 +157,13 @@ public class RaftNode {
             entries.add(logEntry);
             newLastLogIndex = raftLog.append(entries);
 //            raftLog.updateMetaData(currentTerm, null, raftLog.getFirstLogIndex());
-
+//            raftLog.getEntry(newLastLogIndex).getData().toByteArray();
             for (RaftProto.Server server : configuration.getServersList()) {
                 final Peer peer = peerMap.get(server.getServerId());
                 executorService.submit(new Runnable() {
                     @Override
                     public void run() {
+                        // TODO leader 新建线程
                         appendEntries(peer);
                     }
                 });
@@ -250,6 +251,7 @@ public class RaftNode {
         }
 
         RaftProto.AppendEntriesRequest request = requestBuilder.build();
+        // TODO leader 发送 request
         RaftProto.AppendEntriesResponse response = peer.getRaftConsensusServiceAsync().appendEntries(request);
 
         lock.lock();
