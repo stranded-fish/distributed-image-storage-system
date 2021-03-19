@@ -25,7 +25,7 @@ public class ExampleStateMachine implements StateMachine {
     }
 
     private RocksDB db;
-    private String raftDataDir;
+    private final String raftDataDir;
 
     public ExampleStateMachine(String raftDataDir) {
         this.raftDataDir = raftDataDir;

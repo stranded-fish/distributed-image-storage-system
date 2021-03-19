@@ -8,5 +8,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Yulan Zhou
  */
 public interface CloneService {
+
     void cloneImages(HttpServletResponse httpServletResponse);
+
 }
