@@ -16,13 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import static cn.yulan.upload.module.util.ConstUtil.UPLOAD_SUCCESS;
 
 /**
- * 图片相关操作服务层实现类
+ * 图片上传模块服务层实现类
  *
  * @author Yulan Zhou
- * @date 2021/03/12
  */
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -33,61 +32,63 @@ public class ImageServiceImpl implements ImageService {
     @Value("${raft.ipPorts}")
     private String ipPorts;
 
+    private String relativePath;
+
+    /**
+     * 上传图片（保存预处理）
+     *
+     * @author Yulan Zhou
+     */
     @Override
     public void upload(MultipartFile uploadImg, BaseResult<String> result) {
 
-        // 生成图片唯一标识 key
+        // 生成图片唯一标识 key MD5.jpg/png...
         String key = FileUtil.getMD5(uploadImg) + "." + FilenameUtils.getExtension(uploadImg.getOriginalFilename());
-
-        String accessURL = null;
 
         // 判断图片是否重复
         if (imageKVDAO.keyMayExist(key.getBytes())) {
             byte[] bytes = imageKVDAO.get(key.getBytes());
             if (bytes != null) {
-                accessURL = new String(bytes);
-                System.out.println("repeat");
-                System.out.println("accessURL: " + accessURL);
-                return;
+                relativePath = new String(bytes);
             } else {
-                System.out.println("中招了！！");
                 save(key, uploadImg);
             }
         } else {
             save(key, uploadImg);
         }
 
-        // 返回图片地址
-        result.construct(null, false, null);
+        // 返回图片相对路径
+        result.construct(UPLOAD_SUCCESS, true, relativePath);
     }
 
+    /**
+     * 保存图片
+     *
+     * @author Yulan Zhou
+     */
     private void save(String key, MultipartFile uploadImg) {
 
-        // 保存 图片文件 至 本地文件系统
-        String relativePath = FileUtil.getDateDir() + key;
-        System.out.println("relativePath: " + relativePath);
-        String savePath = FileUtil.getBaseDir() + relativePath;
-        System.out.println("savePath: " + savePath);
+        // Step 1. 保存 图片文件 至 本地文件系统
+        relativePath = FileUtil.getDateDir() + key;
+        FileUtil.save(uploadImg, FileUtil.getBaseDir() + relativePath);
 
-        FileUtil.save(uploadImg, savePath);
-
-        // 保存 图片 key - value 到 本地数据库
+        // Step 2. 保存 图片 key - value 到 本地数据库
         imageKVDAO.put(key.getBytes(), relativePath.getBytes());
 
-        // 保存 图片 key - value 到 Raft 集群
-
+        // Step 3. 保存 图片 key - value 到 Raft 集群
         // 初始化 rpc client
         RpcClient rpcClient = new RpcClient(ipPorts);
         ExampleService exampleService = BrpcProxy.getProxy(rpcClient, ExampleService.class);
         final JsonFormat jsonFormat = new JsonFormat();
 
-        // set
+        // set key - value
         ExampleProto.SetRequest setRequest = ExampleProto.SetRequest.newBuilder()
                 .setKey(key).setValue(relativePath).build();
         ExampleProto.SetResponse setResponse = exampleService.set(setRequest);
         System.out.printf("set request, key=%s value=%s response=%s\n",
                 key, relativePath, jsonFormat.printToString(setResponse));
 
+        // 关闭 rpc client
         rpcClient.stop();
     }
 }

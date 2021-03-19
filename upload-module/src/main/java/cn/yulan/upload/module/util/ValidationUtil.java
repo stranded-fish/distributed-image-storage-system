@@ -2,7 +2,6 @@ package cn.yulan.upload.module.util;
 
 import cn.yulan.upload.module.result.BaseResult;
 import org.apache.tika.Tika;
-import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +14,6 @@ import java.io.IOException;
  * 上传文件效验工具
  *
  * @author Yulan Zhou
- * @date 2021/03/13
  */
 @Component
 public class ValidationUtil {
@@ -25,7 +23,14 @@ public class ValidationUtil {
 
     private static long MAXFILESIZEINBYTE;
 
-
+    /**
+     * 验证上传文件合法性
+     *
+     * @param uploadImg 待验证文件
+     * @param result 返回结果                
+     * @return boolean
+     * @author Yulan Zhou
+     */
     public static boolean validate(MultipartFile uploadImg, BaseResult<?> result) {
 
         // 判断上传文件是否为空
@@ -50,6 +55,13 @@ public class ValidationUtil {
         return true;
     }
 
+    /**
+     * 判断上传文件是否为图片
+     *
+     * @param uploadImg 待验证文件
+     * @return boolean
+     * @author Yulan Zhou
+     */
     private static boolean isImage(MultipartFile uploadImg) {
         Tika tika = new Tika();
 
@@ -64,6 +76,13 @@ public class ValidationUtil {
         return true;
     }
 
+    /**
+     * 判断图片规格是否符合自定义要求
+     *
+     * @param uploadImg 待验证文件
+     * @return boolean
+     * @author Yulan Zhou
+     */
     private static boolean whetherMeetsRequirements(MultipartFile uploadImg) {
 
         // 检测图片大小是否符合要求
@@ -74,6 +93,11 @@ public class ValidationUtil {
         return true;
     }
 
+    /**
+     * 获取配置文件中上传文件的大小限制，并将其统一转化为字节数
+     *
+     * @author Yulan Zhou
+     */
     @PostConstruct
     private void getMaxFileSizeInByte() {
         try {

@@ -1,7 +1,6 @@
 package cn.yulan.upload.module.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.tools.ant.taskdefs.Sleep;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,13 +10,11 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 /**
- * 文件工具类
+ * 文件操作工具
  *
  * @author Yulan Zhou
- * @date 2021/03/12
  */
 @Component
 public class FileUtil {
@@ -27,6 +24,14 @@ public class FileUtil {
 
     private static String baseDir;
 
+    @PostConstruct
+    private void setBaseDir() {
+        baseDir = preSetBaseDir;
+    }
+
+    public static String getBaseDir() {
+        return baseDir;
+    }
 
     /**
      * 利用 MD5 算法获得上传图片唯一标识
@@ -34,7 +39,6 @@ public class FileUtil {
      * @param multipartFile 上传图片
      * @return java.lang.String
      * @author Yulan Zhou
-     * @date 2021/3/15
      */
     public static String getMD5(MultipartFile multipartFile) {
         String md5 = null;
@@ -46,18 +50,25 @@ public class FileUtil {
         return md5;
     }
 
-
+    /**
+     * 获取当前日期的指定格式字符串
+     *
+     * @return java.lang.String
+     * @author Yulan Zhou
+     */
     public static String getDateDir() {
-        // 生成 value - 保存路径
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
         return simpleDateFormat.format(date) + File.separator;
     }
 
-    public static String getBaseDir() {
-        return baseDir;
-    }
-
+    /**
+     * 将图片保存到本地文件系统的指定路径
+     *
+     * @param uploadImg 待保存图片
+     * @param savePath 保存路径
+     * @author Yulan Zhou
+     */
     public static void save(MultipartFile uploadImg, String savePath) {
         File file = new File(savePath);
         if (!file.getParentFile().exists()) {
@@ -68,10 +79,5 @@ public class FileUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @PostConstruct
-    private void setBaseDir() {
-        baseDir = preSetBaseDir;
     }
 }

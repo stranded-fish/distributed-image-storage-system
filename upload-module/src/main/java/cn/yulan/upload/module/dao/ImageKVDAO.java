@@ -8,15 +8,12 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * 图片 key - value 持久层
  *
  * @author Yulan Zhou
- * @date 2021/03/15
  */
-
 @Repository
 public class ImageKVDAO {
 
@@ -45,8 +42,6 @@ public class ImageKVDAO {
         //        log.info("RocksDB initialized and ready to use");
     }
 
-
-    //
     public boolean keyMayExist(byte[] bytes) {
         return db.keyMayExist(bytes, new StringBuffer());
     }
@@ -67,5 +62,4 @@ public class ImageKVDAO {
             e.printStackTrace();
         }
     }
-
 }
