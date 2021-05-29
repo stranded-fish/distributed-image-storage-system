@@ -15,7 +15,7 @@ public class BaseResult<T> {
     private boolean success;
     private T data;
 
-    public void construct(String message, boolean success, T data){
+    public void construct(String message, boolean success, T data) {
         this.message = message;
         this.success = success;
         this.data = data;

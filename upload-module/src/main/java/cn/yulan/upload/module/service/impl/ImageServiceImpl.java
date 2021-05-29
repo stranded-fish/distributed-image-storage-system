@@ -4,6 +4,7 @@ import cn.yulan.storage.module.server.service.ExampleProto;
 import cn.yulan.storage.module.server.service.ExampleService;
 import cn.yulan.upload.module.dao.ImageKVDAO;
 import cn.yulan.upload.module.result.BaseResult;
+import cn.yulan.upload.module.result.UploadResult;
 import cn.yulan.upload.module.service.ImageService;
 import cn.yulan.upload.module.util.FileUtil;
 import com.baidu.brpc.client.BrpcProxy;
@@ -32,6 +33,9 @@ public class ImageServiceImpl implements ImageService {
     @Value("${raft.ipPorts}")
     private String ipPorts;
 
+    @Value("${web.image-root-path}")
+    private String imageRootPath;
+
     private String relativePath;
 
     /**
@@ -40,7 +44,7 @@ public class ImageServiceImpl implements ImageService {
      * @author Yulan Zhou
      */
     @Override
-    public void upload(MultipartFile uploadImg, BaseResult<String> result) {
+    public void upload(MultipartFile uploadImg, BaseResult<UploadResult> result) {
 
         // 生成图片唯一标识 key MD5.jpg/png...
         String key = FileUtil.getMD5(uploadImg) + "." + FilenameUtils.getExtension(uploadImg.getOriginalFilename());
@@ -57,8 +61,12 @@ public class ImageServiceImpl implements ImageService {
             save(key, uploadImg);
         }
 
-        // 返回图片相对路径
-        result.construct(UPLOAD_SUCCESS, true, relativePath);
+        // 构造图片链接
+        UploadResult uploadResult = new UploadResult();
+        uploadResult.construct(imageRootPath, relativePath);
+
+        // 返回图片链接
+        result.construct(UPLOAD_SUCCESS, true, uploadResult);
     }
 
     /**

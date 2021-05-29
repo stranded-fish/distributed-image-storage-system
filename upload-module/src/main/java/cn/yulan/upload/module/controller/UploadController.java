@@ -1,6 +1,7 @@
 package cn.yulan.upload.module.controller;
 
 import cn.yulan.upload.module.result.BaseResult;
+import cn.yulan.upload.module.result.UploadResult;
 import cn.yulan.upload.module.service.ImageService;
 import cn.yulan.upload.module.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +34,8 @@ public class UploadController {
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public BaseResult<String> uploadImage(@RequestParam("uploadImg") MultipartFile uploadImg) {
-        BaseResult<String> result = new BaseResult<>();
+    public BaseResult<UploadResult> uploadImage(@RequestParam("uploadImg") MultipartFile uploadImg) {
+        BaseResult<UploadResult> result = new BaseResult<>();
 
         // 验证上传文件是否合法
         if (ValidationUtil.validate(uploadImg, result)) {
