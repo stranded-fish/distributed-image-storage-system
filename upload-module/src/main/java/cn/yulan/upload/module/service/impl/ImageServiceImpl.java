@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import static cn.yulan.upload.module.result.ResultCode.SUCCESS;
 import static cn.yulan.upload.module.util.ConstUtil.UPLOAD_SUCCESS;
 
 /**
@@ -66,7 +67,7 @@ public class ImageServiceImpl implements ImageService {
         uploadResult.construct(imageRootPath, relativePath);
 
         // 返回图片链接
-        result.construct(UPLOAD_SUCCESS, true, uploadResult);
+        result.construct(SUCCESS, uploadResult);
     }
 
     /**

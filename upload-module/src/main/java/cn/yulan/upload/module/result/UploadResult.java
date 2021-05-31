@@ -22,5 +22,4 @@ public class UploadResult {
     public void construct(String imageRootPath, String relativePath) {
         this.url = imageRootPath + relativePath;
     }
-
 }

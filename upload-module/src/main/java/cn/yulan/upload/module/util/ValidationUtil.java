@@ -1,6 +1,7 @@
 package cn.yulan.upload.module.util;
 
 import cn.yulan.upload.module.result.BaseResult;
+import cn.yulan.upload.module.result.UploadResult;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+
+import static cn.yulan.upload.module.result.ResultCode.*;
 
 
 /**
@@ -31,23 +34,25 @@ public class ValidationUtil {
      * @return boolean
      * @author Yulan Zhou
      */
-    public static boolean validate(MultipartFile uploadImg, BaseResult<?> result) {
+    public static boolean validate(MultipartFile uploadImg, BaseResult<UploadResult> result) {
+
+        UploadResult uploadResult = new UploadResult();
 
         // 判断上传文件是否为空
         if (uploadImg.isEmpty()) {
-            result.construct(ConstUtil.FILE_NOT_EXIST, false, null);
+            result.construct(FILE_NOT_EXIST_ERROR, null);
             return false;
         }
 
         // 判断上传文件是否为规定图片格式
         if (!isImage(uploadImg)) {
-            result.construct(ConstUtil.FORMAT_NOT_SUPPORTED, false, null);
+            result.construct(FORMAT_NOT_SUPPORTED_ERROR, null);
             return false;
         }
 
-        // 判断图片规格是否符合要求
-        if (!whetherMeetsRequirements(uploadImg)) {
-            result.construct(ConstUtil.NOT_MEET_REQUIREMENTS, false, null);
+        // 判断图片大小是否符合要求
+        if (!whetherExceedSizeLimit(uploadImg)) {
+            result.construct(EXCEED_MAX_SILE_LIMIT_ERROR, null);
             return false;
         }
 
@@ -83,7 +88,7 @@ public class ValidationUtil {
      * @return boolean
      * @author Yulan Zhou
      */
-    private static boolean whetherMeetsRequirements(MultipartFile uploadImg) {
+    private static boolean whetherExceedSizeLimit(MultipartFile uploadImg) {
 
         // 检测图片大小是否符合要求
         if (uploadImg.getSize() > MAXFILESIZEINBYTE) {

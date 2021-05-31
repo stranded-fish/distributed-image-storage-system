@@ -5,7 +5,7 @@ if [ $# -ne 2 ]; then
     echo "  ./run_upload_module.sh PORT CLUSTER"
     echo
     echo "Examples:"
-    echo "  ./run_upload_module.sh 80 list://127.0.0.1:8051,127.0.0.1:8052,127.0.0.1:8053  # Listening on port 80 with cluster IP and port list"
+    echo "  ./run_upload_module.sh 8080 list://127.0.0.1:8051,127.0.0.1:8052,127.0.0.1:8053  # Listening on port 8080 with cluster IP and port list"
     exit
 fi
 
