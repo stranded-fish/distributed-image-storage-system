@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Controller
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class UploadController {
 
     private final ImageService imageService;
@@ -35,12 +37,18 @@ public class UploadController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public BaseResult<UploadResult> uploadImage(@RequestParam("uploadImg") MultipartFile uploadImg) {
+
+        log.info("Image: [{}] upload request received", uploadImg.getOriginalFilename());
+
         BaseResult<UploadResult> result = new BaseResult<>();
 
         // 验证上传文件是否合法
         if (ValidationUtil.validate(uploadImg, result)) {
+            log.info("Image: [{}] passed the validation, start uploading image......", uploadImg.getOriginalFilename());
             imageService.upload(uploadImg, result);
         }
+
+        log.info("Image: [{}] upload request completed", uploadImg.getOriginalFilename());
 
         return result;
     }

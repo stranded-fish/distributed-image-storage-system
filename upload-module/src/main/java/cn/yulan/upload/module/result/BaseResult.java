@@ -2,8 +2,6 @@ package cn.yulan.upload.module.result;
 
 import lombok.*;
 
-import static cn.yulan.upload.module.result.ResultCode.SUCCESS;
-
 /**
  * 基础返回结果
  *

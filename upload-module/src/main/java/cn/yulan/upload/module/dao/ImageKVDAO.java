@@ -1,5 +1,6 @@
 package cn.yulan.upload.module.dao;
 
+import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -15,6 +16,7 @@ import java.io.File;
  * @author Yulan Zhou
  */
 @Repository
+@Slf4j
 public class ImageKVDAO {
 
     @Value("${rocksdb-save-path}")
@@ -34,12 +36,10 @@ public class ImageKVDAO {
             }
             db = RocksDB.open(options, dbPath);
         } catch (RocksDBException e) {
-//            log.error("Error initializng RocksDB, check configurations and permissions, exception: {}, message: {}, stackTrace: {}",
-//                    ex.getCause(), ex.getMessage(), ex.getStackTrace());
-            e.printStackTrace();
+            log.error("Error initializing RocksDB, check configurations and permissions, exception: {}, message: {}, stackTrace: {}",
+                    e.getCause(), e.getMessage(), e.getStackTrace());
         }
-        System.out.println("RocksDB initialized and ready to use");
-        //        log.info("RocksDB initialized and ready to use");
+        log.info("RocksDB initialized and ready to use");
     }
 
     public boolean keyMayExist(byte[] bytes) {
@@ -50,7 +50,8 @@ public class ImageKVDAO {
         try {
             return db.get(key);
         } catch (RocksDBException e) {
-            e.printStackTrace();
+            log.error("Error executing GET operation, check configurations and permissions, exception: {}, message: {}, stackTrace: {}",
+                    e.getCause(), e.getMessage(), e.getStackTrace());
         }
         return null;
     }
@@ -59,7 +60,8 @@ public class ImageKVDAO {
         try {
             db.put(key, value);
         } catch (RocksDBException e) {
-            e.printStackTrace();
+            log.error("Error executing PUT operation, check configurations and permissions, exception: {}, message: {}, stackTrace: {}",
+                    e.getCause(), e.getMessage(), e.getStackTrace());
         }
     }
 }

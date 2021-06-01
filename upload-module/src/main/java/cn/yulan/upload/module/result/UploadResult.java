@@ -1,7 +1,6 @@
 package cn.yulan.upload.module.result;
 
 import lombok.*;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * 上传图片返回结果

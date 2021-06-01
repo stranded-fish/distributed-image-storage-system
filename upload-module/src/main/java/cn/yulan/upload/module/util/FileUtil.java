@@ -1,5 +1,6 @@
 package cn.yulan.upload.module.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.util.Date;
  * @author Yulan Zhou
  */
 @Component
+@Slf4j
 public class FileUtil {
 
     @Value("${multipartFile.base-dir}")
@@ -45,6 +47,8 @@ public class FileUtil {
         try {
             md5 = DigestUtils.md5Hex(multipartFile.getBytes());
         } catch (IOException e) {
+            log.error("Error calculating the MD5 of image: [{}], exception: {}, message: {}, stackTrace: {}",
+                    multipartFile.getName(), e.getCause(), e.getMessage(), e.getStackTrace());
             e.printStackTrace();
         }
         return md5;
@@ -66,18 +70,24 @@ public class FileUtil {
      * 将图片保存到本地文件系统的指定路径
      *
      * @param uploadImg 待保存图片
-     * @param savePath 保存路径
+     * @param savePath  保存路径
      * @author Yulan Zhou
      */
     public static void save(MultipartFile uploadImg, String savePath) {
         File file = new File(savePath);
+
         if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+            if (!file.getParentFile().mkdirs()) {
+                log.error("Error creating directory [{}], check path and permissions", file.getParentFile().getName());
+            }
         }
+
         try {
             uploadImg.transferTo(file);
+            log.info("Save image: [{}] to [{}]", uploadImg.getOriginalFilename(), file.getPath());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error saving image: [{}] to local file system: [{}], check path and permissions, exception: {}, message: {}, stackTrace: {}",
+                    uploadImg.getOriginalFilename(), savePath, e.getCause(), e.getMessage(), e.getStackTrace());
         }
     }
 }

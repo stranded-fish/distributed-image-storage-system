@@ -1,6 +1,5 @@
 package cn.yulan.upload.module.result;
 
-import lombok.Data;
 import lombok.Getter;
 
 import static cn.yulan.upload.module.util.ConstUtil.*;
@@ -19,7 +18,7 @@ public enum ResultCode {
 
     FORMAT_NOT_SUPPORTED_ERROR(1002, FORMAT_NOT_SUPPORTED),
 
-    EXCEED_MAX_SILE_LIMIT_ERROR(1003, NOT_MEET_REQUIREMENTS);
+    EXCEED_MAX_SILE_LIMIT_ERROR(1003, EXCEED_MAX_SILE_LIMIT);
 
     private int code;
     private String message;
